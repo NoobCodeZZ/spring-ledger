@@ -8,7 +8,7 @@ CREATE TABLE BANKS (
 
 CREATE TABLE USERS (
                        ID INT PRIMARY KEY,
-                        reference_id TEXT,
+                     reference_id TEXT,
                        user_name TEXT,
                        created_at DATE,
                        updated_at DATE

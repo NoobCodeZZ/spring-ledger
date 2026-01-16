@@ -30,7 +30,6 @@ public class LoanDbService {
 
     public Optional<LoanEntity> findByLoanReferenceID(String loanRefID) {
         return loanRepository.findByReferenceId(loanRefID);
-
     }
 
     public List<LoanEntity> findByUserID(long userRefId) {

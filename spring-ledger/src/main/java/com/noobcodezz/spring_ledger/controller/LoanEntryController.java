@@ -1,11 +1,14 @@
 package com.noobcodezz.spring_ledger.controller;
 
 import com.noobcodezz.spring_ledger.models.LoanCreationDto;
+import com.noobcodezz.spring_ledger.models.PaymentDto;
+import com.noobcodezz.spring_ledger.models.RecordPaymentDto;
 import com.noobcodezz.spring_ledger.service.LoanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,5 +23,11 @@ public class LoanEntryController {
     public ResponseEntity<String> createLoan(@RequestBody LoanCreationDto loanCreationDto) {
         loanService.createLoan(loanCreationDto);
         return ResponseEntity.ok().body("loan created");
+    }
+
+    @PostMapping("v1/payment")
+    public ResponseEntity<String> createPayment(@RequestBody RecordPaymentDto recordPaymentDto) {
+        loanService.makePayment(recordPaymentDto);
+        return ResponseEntity.ok().body("payment made successfully");
     }
  }
