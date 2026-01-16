@@ -50,6 +50,25 @@ public class LoanDbService {
         loanRepository.save(loanEntity);
     }
 
+    private LoanDto mapEntityToDto(LoanEntity loanEntity) {
+        LoanDto loanDto = new LoanDto();
+        loanDto.setPrincipal(loanEntity.getPrincipal());
+        loanDto.setRoi(loanEntity.getRoi());
+        loanDto.setYears((int) loanEntity.getYears());
+        loanDto.setBankRefID(bankRepository.findById(loanEntity.getBankId())
+                .map(bank -> bank.getReferenceId())
+                .orElse(null));
+        loanDto.setUserRefID(userRepository.findById(loanEntity.getUserId())
+                .map(user -> user.getReferenceId())
+                .orElse(null));
+        return loanDto;
+    }
+
+    public Optional<LoanDto> findDtoByLoanReferenceID(String loanRefID) {
+        return loanRepository.findByReferenceId(loanRefID)
+                .map(this::mapEntityToDto);
+    }
+
 //    private Optional<LoanEntity> mapDtoToEntity() {
 //
 //    }

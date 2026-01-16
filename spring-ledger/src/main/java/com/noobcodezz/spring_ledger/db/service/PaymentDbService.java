@@ -23,4 +23,20 @@ public class PaymentDbService {
         paymentEntity.setEmiNumber(paymentDto.getEmiNumber());
         paymentRepository.save(paymentEntity);
     }
+
+    public List<PaymentDto>returnPayments() {
+        return paymentRepository.findAll().stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    private PaymentDto convertToDto(PaymentEntity entity) {
+        PaymentDto dto = new PaymentDto();
+        dto.setAmount(entity.getAmount());
+        dto.setEmiNumber(entity.getEmiNumber());
+        dto.setLoanRefId(loanRepository.findById(entity.getLoanId())
+                .map(loan -> loan.getReferenceId())
+                .orElse(null));
+        return dto;
+    }
 }

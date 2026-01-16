@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -38,11 +40,35 @@ public class LoanService {
         paymentDbService.recordPayment(paymentDto);
     }
 
-    public void fetchBalance(BalanceDto balanceDto) {
+
+    public String fetchBalance(RequestBalanceDto requestBalanceDto) {
         // have to fetch the loan entity/dto corresponding to this particular paymentDto,
         // need to store all the lumpSum payments somewhere
+        // the balance will take the loanRefId as input request inside the json
+        // no need of creating balanceDto
+        String loanRefID = requestBalanceDto.getLoanRefId();
+        BalanceDto balanceDto = new BalanceDto();
+        balanceDto.setEmiNumber(requestBalanceDto.getEmiNumber());
+        balanceDto.setLoanRefId(loanRefID);
+
+        // get all the lumpSum payment details from paymentService
+        // get Loan Details from the loanDbService
+        List<PaymentDto> payments = paymentDbService.returnPayments();
+        LoanDto loanDto = loanDbService.findDtoByLoanReferenceID(requestBalanceDto.getLoanRefId()).orElseThrow(() -> new RuntimeException("Loan not found for reference ID: " + loanRefID));;
+
+
+        double totalLumpSumPaid = payments.stream()
+                .filter(payment -> loanRefID.equals(payment.getLoanRefId()))
+                .mapToDouble(PaymentDto::getAmount)
+                .sum();
+
+        double totalRepayment = loanDto.getPrincipal()* (1+loanDto.getYears()*loanDto.getRoi()/100);
+        double emiAmount = totalRepayment/(loanDto.getYears()*12);
+        double emiAmountPaid = requestBalanceDto.getEmiNumber()*emiAmount;
+        double balance = totalRepayment-totalLumpSumPaid - emiAmountPaid ;
+        if(balance < 0) {
+            balance = 0;
+        }
+        return String.format("Balance: %.2f", balance);
     }
-
-
-
 }
