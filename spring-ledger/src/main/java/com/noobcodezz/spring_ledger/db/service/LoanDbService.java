@@ -1,0 +1,63 @@
+package com.noobcodezz.spring_ledger.db.service;
+
+import com.noobcodezz.spring_ledger.db.entity.LoanEntity;
+import com.noobcodezz.spring_ledger.db.repository.BankRepository;
+import com.noobcodezz.spring_ledger.db.repository.LoanRepository;
+import com.noobcodezz.spring_ledger.db.repository.UserRepository;
+import com.noobcodezz.spring_ledger.models.LoanDto;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class LoanDbService {
+    private final LoanRepository loanRepository;
+    private final BankRepository bankRepository;
+    private final UserRepository userRepository;
+
+//    public Optional<> findByUserID(String userID) {
+//        loanRepository.findByUserId(userID);
+//    }
+//
+//    private UserEntity mapDtoToEntity(UserEntity userEntity) {
+//        BankEntity bankEntity = new BankEntity();
+//    }
+
+    public Optional<LoanEntity> findByLoanReferenceID(UUID loanRefID) {
+        return loanRepository.findByReferenceId(String.valueOf(loanRefID));
+
+    }
+
+    public List<LoanEntity> findByUserID(long userRefId) {
+        return loanRepository.findByUserId(userRefId);
+    }
+
+    public List<LoanEntity> findByBankID(long bankRefId) {
+        return loanRepository.findByBankId(bankRefId);
+    }
+
+    public void createLoan(LoanDto loanDto) {
+        LoanEntity loanEntity = new LoanEntity();
+        loanEntity.setBankId(bankRepository.findByReferenceId(loanDto.getBankRefID()).orElseThrow().getId());
+        loanEntity.setUserId(userRepository.findByReferenceId(String.valueOf(loanDto.getUserRefID())).orElseThrow().getId());
+        loanEntity.setRoi(loanDto.getRoi());
+        loanEntity.setYears(loanDto.getYears());
+        loanEntity.setPrincipal(loanDto.getPrincipal());
+        loanRepository.save(loanEntity);
+    }
+
+//    private Optional<LoanEntity> mapDtoToEntity() {
+//
+//    }
+//
+//    private Optional<LoanDto> mapEntityToDto() {
+//
+//    }
+
+}
