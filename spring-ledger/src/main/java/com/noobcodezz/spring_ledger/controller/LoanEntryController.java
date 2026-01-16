@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-//@RequestMapping(/)
+//@RequestMapping(/)\
 @RequiredArgsConstructor
 public class LoanEntryController {
     private final LoanService loanService;

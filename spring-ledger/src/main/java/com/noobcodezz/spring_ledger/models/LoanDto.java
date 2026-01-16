@@ -4,15 +4,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoanDto {
-    private UUID loanID;
-    private UUID UserRefID;
-    private UUID BankRefID;
+    private String loanID;
+    private String UserRefID;
+    private String BankRefID;
     private double principal;
     private double roi;
     private int years;

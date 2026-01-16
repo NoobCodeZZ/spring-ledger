@@ -26,5 +26,6 @@ public class LoanService {
         loanDbService.createLoan(loanDto);
     }
 
-    public void lumpSumPayment()
+
+
 }

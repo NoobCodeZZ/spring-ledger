@@ -18,9 +18,15 @@ public class UserEntity {
     @Column(name = "id")
     private long id;
 
-
     @Column(name = "reference_id")
     private String referenceId;
+
+    @PrePersist
+    public void generateReferenceId() {
+        if(this.referenceId == null){
+            this.referenceId = UUID.randomUUID().toString();
+        }
+    }
 
     @Column(name = "user_name")
     private String userName;

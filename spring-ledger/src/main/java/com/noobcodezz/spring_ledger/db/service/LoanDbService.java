@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -29,8 +28,8 @@ public class LoanDbService {
 //        BankEntity bankEntity = new BankEntity();
 //    }
 
-    public Optional<LoanEntity> findByLoanReferenceID(UUID loanRefID) {
-        return loanRepository.findByReferenceId(String.valueOf(loanRefID));
+    public Optional<LoanEntity> findByLoanReferenceID(String loanRefID) {
+        return loanRepository.findByReferenceId(loanRefID);
 
     }
 
@@ -45,7 +44,7 @@ public class LoanDbService {
     public void createLoan(LoanDto loanDto) {
         LoanEntity loanEntity = new LoanEntity();
         loanEntity.setBankId(bankRepository.findByReferenceId(loanDto.getBankRefID()).orElseThrow().getId());
-        loanEntity.setUserId(userRepository.findByReferenceId(String.valueOf(loanDto.getUserRefID())).orElseThrow().getId());
+        loanEntity.setUserId(userRepository.findByReferenceId(loanDto.getUserRefID()).orElseThrow().getId());
         loanEntity.setRoi(loanDto.getRoi());
         loanEntity.setYears(loanDto.getYears());
         loanEntity.setPrincipal(loanDto.getPrincipal());

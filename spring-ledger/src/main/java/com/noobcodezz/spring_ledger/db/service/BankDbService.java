@@ -7,14 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class BankDbService {
     private final BankRepository bankRepository;
-    public Optional<BankEntity> findByBankReferenceId(UUID bankRefId) {
+    public Optional<BankEntity> findByBankReferenceId(String bankRefId) {
         return bankRepository.findByReferenceId(bankRefId);
     }
 

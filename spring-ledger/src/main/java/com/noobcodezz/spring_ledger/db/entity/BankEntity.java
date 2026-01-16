@@ -19,7 +19,14 @@ public class BankEntity {
     private long id;
 
     @Column(name = "reference_id")
-    private UUID referenceId;
+    private String referenceId;
+
+    @PrePersist
+    public void generateReferenceId() {
+        if(this.referenceId == null){
+            this.referenceId = UUID.randomUUID().toString();
+        }
+    }
 
     @Column(name = "bank_name")
     private String bankName;

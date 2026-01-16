@@ -22,10 +22,15 @@ public class LoanEntity {
     @Column(name = "id")
     private long id;
 
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "reference_id")
     private String referenceId;
 
+    @PrePersist
+    public void generateReferenceId() {
+        if(this.referenceId == null){
+                this.referenceId = UUID.randomUUID().toString();
+        }
+    }
     // it is important to save the timestamps at which the project was created at and also that which the project was last updated at
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

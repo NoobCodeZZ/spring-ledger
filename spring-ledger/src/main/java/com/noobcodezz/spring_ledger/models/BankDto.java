@@ -5,14 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
 public class BankDto {
-    private UUID refId;
+    private String refId;
     private String bankName;
     private Instant createdAt;
 }
