@@ -14,7 +14,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserDbService {
     private final UserRepository userRepository;
-
+    public Optional<UserEntity> findByUserReferenceId(String userRefId) {
+        return userRepository.findByReferenceId(userRefId);
+    }
 
 //    private Optional<UserDto> mapEntityToDto(UserEntity userEntity) {}
 //

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -18,8 +19,8 @@ public class LoanEntryController {
     @PostMapping("v1/loan")
     //ResponseEntity
     public ResponseEntity<String> createLoan(@RequestBody LoanCreationDto loanCreationDto) {
-        loanService.createLoan(loanCreationDto);
-        return ResponseEntity.ok().body("loan created");
+        String loanRefId = loanService.createLoan(loanCreationDto);
+        return ResponseEntity.ok().body(loanRefId);
     }
 
     @PostMapping("v1/payment")
@@ -29,7 +30,11 @@ public class LoanEntryController {
     }
 
     @GetMapping("v1/balance")
-    public ResponseEntity<String> getBalance(@RequestBody RequestBalanceDto requestBalanceDto) {
+    public ResponseEntity<String> getBalance(@RequestParam String loanRefId,
+                                             @RequestParam int emiNumber) {
+        RequestBalanceDto requestBalanceDto = new RequestBalanceDto();
+        requestBalanceDto.setLoanRefId(loanRefId);
+        requestBalanceDto.setEmiNumber(emiNumber);
         String balance = loanService.fetchBalance(requestBalanceDto);
         return ResponseEntity.ok().body(balance);
     }

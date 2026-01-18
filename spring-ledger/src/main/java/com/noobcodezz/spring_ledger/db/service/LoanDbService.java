@@ -40,7 +40,7 @@ public class LoanDbService {
         return loanRepository.findByBankId(bankRefId);
     }
 
-    public void createLoan(LoanDto loanDto) {
+    public String createLoan(LoanDto loanDto) {
         LoanEntity loanEntity = new LoanEntity();
         loanEntity.setBankId(bankRepository.findByReferenceId(loanDto.getBankRefID()).orElseThrow().getId());
         loanEntity.setUserId(userRepository.findByReferenceId(loanDto.getUserRefID()).orElseThrow().getId());
@@ -48,6 +48,7 @@ public class LoanDbService {
         loanEntity.setYears(loanDto.getYears());
         loanEntity.setPrincipal(loanDto.getPrincipal());
         loanRepository.save(loanEntity);
+        return loanEntity.getReferenceId();
     }
 
     private LoanDto mapEntityToDto(LoanEntity loanEntity) {
