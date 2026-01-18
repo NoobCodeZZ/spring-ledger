@@ -82,6 +82,9 @@ public class LoanDbService {
         loanDto.setUserRefID(userRepository.findById(loanEntity.getUserId())
                 .map(user -> user.getReferenceId())
                 .orElse(null));
+        loanDto.setEmiDurationMonths(loanEntity.getEmiDurationMonths());
+        loanDto.setEmiAmount(loanEntity.getEmiAmount());
+        loanDto.setTotalRepayment(loanEntity.getTotalRepayment());
         return loanDto;
     }
 

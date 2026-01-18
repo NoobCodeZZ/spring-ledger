@@ -1,4 +1,5 @@
 package com.noobcodezz.spring_ledger.models;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,7 @@ public class LoanDto {
     private BigDecimal roi;
     private int years;
     private Instant createdAt;
+    private BigDecimal emiAmount;
+    private BigDecimal totalRepayment;
+    private int emiDurationMonths;
 }

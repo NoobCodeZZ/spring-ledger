@@ -74,6 +74,13 @@ public class LoanService {
             errors.add("Invalid parameters : input parameters cannot be negative or zero");
         }
 
+        LoanDto loanDto = loanDbService.findDtoByLoanReferenceID(recordPaymentDto.getLoanRefId())
+                .orElseThrow(() -> new RuntimeException("Loan not found for reference ID: " + recordPaymentDto.getLoanRefId()));
+
+        if(recordPaymentDto.getAmount().compareTo(loanDto.getTotalRepayment()) > 0) {
+            errors.add("The payment amount cannot be greater than the total repayment amount");
+        }
+
         if(!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
@@ -107,33 +114,24 @@ public class LoanService {
             throw new ValidationException(errors);
         }
         String loanRefID = requestBalanceDto.getLoanRefId();
-        BalanceDto balanceDto = new BalanceDto();
-        balanceDto.setEmiNumber(requestBalanceDto.getEmiNumber());
-        balanceDto.setLoanRefId(loanRefID);
 
-        // get all the lumpSum payment details from paymentService
-        // get Loan Details from the loanDbService
-        List<PaymentDto> payments = paymentDbService.returnPayments();
-        LoanDto loanDto = loanDbService.findDtoByLoanReferenceID(requestBalanceDto.getLoanRefId()).orElseThrow(() -> new RuntimeException("Loan not found for reference ID: " + loanRefID));;
+        // Fetch the loan details to get totalRepayment and emiAmount
+        LoanDto loanDto = loanDbService.findDtoByLoanReferenceID(loanRefID)
+                .orElseThrow(() -> new RuntimeException("Loan not found for reference ID: " + loanRefID));
 
-        // now have to filter this such that only that much lumpSum paid is calculated till that particular emi month
+        // Get all the lumpSum payment details for this loan and EMI number
+        List<PaymentDto> payments = paymentDbService.returnPaymentsByLoanAndEmiNumber(loanRefID, requestBalanceDto.getEmiNumber());
+
+
+        // Calculate total lump sum paid (no need to filter - already filtered by DB service)
         BigDecimal totalLumpSumPaid = payments.stream()
-                .filter(payment -> loanRefID.equals(payment.getLoanRefId()))
                 .map(PaymentDto::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Calculate interest: principal * roi * years / 100
-        BigDecimal interest = loanDto.getPrincipal()
-                .multiply(loanDto.getRoi())
-                .multiply(BigDecimal.valueOf(loanDto.getYears()))
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        // Get totalRepayment and emiAmount from the loan
+        BigDecimal totalRepayment = loanDto.getTotalRepayment();
 
-        // Calculate total repayment: interest + principal
-        BigDecimal totalRepayment = interest.add(loanDto.getPrincipal());
-
-        // Calculate EMI amount: totalRepayment / (years * 12)
-        BigDecimal emiAmount = totalRepayment.divide(
-                BigDecimal.valueOf(loanDto.getYears() * 12), 2, RoundingMode.HALF_UP);
+        BigDecimal emiAmount = loanDto.getEmiAmount();
 
         // Calculate EMI amount paid: emiNumber * emiAmount
         BigDecimal emiAmountPaid = BigDecimal.valueOf(requestBalanceDto.getEmiNumber())
@@ -146,6 +144,9 @@ public class LoanService {
 
         if(balance.compareTo(BigDecimal.ZERO) < 0) {
             balance = BigDecimal.ZERO;
+        }
+        else if(balance.compareTo(BigDecimal.ZERO) == 0) {
+            return "The Loan has been repaid";
         }
         return String.format("Balance: %.2f", balance);
     }

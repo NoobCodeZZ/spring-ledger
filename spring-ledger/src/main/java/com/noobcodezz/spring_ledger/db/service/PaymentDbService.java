@@ -30,6 +30,15 @@ public class PaymentDbService {
                 .toList();
     }
 
+    public List<PaymentDto> returnPaymentsByLoanAndEmiNumber(String loanRefId, int emiNumber) {
+        return paymentRepository.findByLoanIdAndEmiNumberLessThanEqual(
+                loanRepository.findByReferenceId(loanRefId).orElseThrow().getId(),
+                emiNumber
+        ).stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
     private PaymentDto convertToDto(PaymentEntity entity) {
         PaymentDto dto = new PaymentDto();
         dto.setAmount(entity.getAmount());

@@ -11,5 +11,5 @@ import java.util.UUID;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Long > {
-
+    List<PaymentEntity> findByLoanIdAndEmiNumberLessThanEqual(long loanId, int emiNumber);
 }
