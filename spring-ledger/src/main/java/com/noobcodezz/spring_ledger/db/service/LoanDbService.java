@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,12 +43,30 @@ public class LoanDbService {
     }
 
     public String createLoan(LoanDto loanDto) {
+        // Calculate interest: principal * roi * years / 100
+        BigDecimal interest = loanDto.getPrincipal()
+                .multiply(loanDto.getRoi())
+                .multiply(BigDecimal.valueOf(loanDto.getYears()))
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+        // Calculate total repayment: interest + principal
+        BigDecimal repaymentAmount = interest.add(loanDto.getPrincipal());
+
+        // Calculate EMI months: years * 12
+        int emiMonths = loanDto.getYears() * 12;
+
+        // Calculate EMI amount: repaymentAmount / emiMonths
+        BigDecimal emiAmount = repaymentAmount.divide(BigDecimal.valueOf(emiMonths), 2, RoundingMode.HALF_UP);
+
         LoanEntity loanEntity = new LoanEntity();
         loanEntity.setBankId(bankRepository.findByReferenceId(loanDto.getBankRefID()).orElseThrow().getId());
         loanEntity.setUserId(userRepository.findByReferenceId(loanDto.getUserRefID()).orElseThrow().getId());
         loanEntity.setRoi(loanDto.getRoi());
         loanEntity.setYears(loanDto.getYears());
         loanEntity.setPrincipal(loanDto.getPrincipal());
+        loanEntity.setEmiDurationMonths(emiMonths);
+        loanEntity.setEmiAmount(emiAmount);
+        loanEntity.setTotalRepayment(repaymentAmount);
         loanRepository.save(loanEntity);
         return loanEntity.getReferenceId();
     }
@@ -55,7 +75,7 @@ public class LoanDbService {
         LoanDto loanDto = new LoanDto();
         loanDto.setPrincipal(loanEntity.getPrincipal());
         loanDto.setRoi(loanEntity.getRoi());
-        loanDto.setYears((int) loanEntity.getYears());
+        loanDto.setYears(loanEntity.getYears());
         loanDto.setBankRefID(bankRepository.findById(loanEntity.getBankId())
                 .map(bank -> bank.getReferenceId())
                 .orElse(null));

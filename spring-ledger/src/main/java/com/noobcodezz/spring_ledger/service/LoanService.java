@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +38,9 @@ public class LoanService {
         if(userDbService.findByUserReferenceId(loanCreationDto.getUserRefId()).isEmpty()) {
             errors.add("User with ID: " + loanCreationDto.getUserRefId() + " not found");
         }
-        if(loanCreationDto.getRoi() <= 0 || loanCreationDto.getYears() <= 0 || loanCreationDto.getPrincipal() <= 0) {
+        if(loanCreationDto.getRoi().compareTo(BigDecimal.ZERO) <= 0 ||
+           loanCreationDto.getYears() <= 0 ||
+           loanCreationDto.getPrincipal().compareTo(BigDecimal.ZERO) <= 0) {
             errors.add("Invalid parameters : input parameters cannot be negative or zero");
         }
 
@@ -65,7 +69,8 @@ public class LoanService {
             errors.add("Loan with ID: " + recordPaymentDto.getLoanRefId()+ " not found");
         }
 
-        if(recordPaymentDto.getAmount() <= 0|| recordPaymentDto.getEmiNumber() <= 0) {
+        if(recordPaymentDto.getAmount().compareTo(BigDecimal.ZERO) <= 0 ||
+           recordPaymentDto.getEmiNumber() <= 0) {
             errors.add("Invalid parameters : input parameters cannot be negative or zero");
         }
 
@@ -112,17 +117,35 @@ public class LoanService {
         LoanDto loanDto = loanDbService.findDtoByLoanReferenceID(requestBalanceDto.getLoanRefId()).orElseThrow(() -> new RuntimeException("Loan not found for reference ID: " + loanRefID));;
 
         // now have to filter this such that only that much lumpSum paid is calculated till that particular emi month
-        double totalLumpSumPaid = payments.stream()
+        BigDecimal totalLumpSumPaid = payments.stream()
                 .filter(payment -> loanRefID.equals(payment.getLoanRefId()))
-                .mapToDouble(PaymentDto::getAmount)
-                .sum();
+                .map(PaymentDto::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        double totalRepayment = loanDto.getPrincipal()* (1+(double)loanDto.getYears()*(double)loanDto.getRoi()/100);
-        double emiAmount = totalRepayment/((double)loanDto.getYears()*12);
-        double emiAmountPaid = (double)requestBalanceDto.getEmiNumber()*emiAmount;
-        double balance = totalRepayment-totalLumpSumPaid - emiAmountPaid ;
-        if(balance < 0) {
-            balance = 0;
+        // Calculate interest: principal * roi * years / 100
+        BigDecimal interest = loanDto.getPrincipal()
+                .multiply(loanDto.getRoi())
+                .multiply(BigDecimal.valueOf(loanDto.getYears()))
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+        // Calculate total repayment: interest + principal
+        BigDecimal totalRepayment = interest.add(loanDto.getPrincipal());
+
+        // Calculate EMI amount: totalRepayment / (years * 12)
+        BigDecimal emiAmount = totalRepayment.divide(
+                BigDecimal.valueOf(loanDto.getYears() * 12), 2, RoundingMode.HALF_UP);
+
+        // Calculate EMI amount paid: emiNumber * emiAmount
+        BigDecimal emiAmountPaid = BigDecimal.valueOf(requestBalanceDto.getEmiNumber())
+                .multiply(emiAmount);
+
+        // Calculate balance: totalRepayment - totalLumpSumPaid - emiAmountPaid
+        BigDecimal balance = totalRepayment
+                .subtract(totalLumpSumPaid)
+                .subtract(emiAmountPaid);
+
+        if(balance.compareTo(BigDecimal.ZERO) < 0) {
+            balance = BigDecimal.ZERO;
         }
         return String.format("Balance: %.2f", balance);
     }

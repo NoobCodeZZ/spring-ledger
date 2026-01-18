@@ -3,6 +3,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Data
@@ -12,7 +13,7 @@ import java.time.Instant;
 public class LoanCreationDto {
     private String bankRefId;
     private String userRefId;
-    private double principal;
+    private BigDecimal principal;
     private int years;
-    private double roi;
+    private BigDecimal roi;
 }

@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.cglib.core.Local;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -47,16 +48,25 @@ public class LoanEntity {
     private long bankId;
 
     @Column(name = "roi")
-    private double roi;
+    private BigDecimal roi;
 
     @Column(name = "years")
-    private long years;
+    private int years;
 
     @Column(name = "principal")
-    private double principal;
+    private BigDecimal principal;
+
+    @Column(name = "emi_amount")
+    private BigDecimal emiAmount;
+
+    @Column(name = "total_repayment")
+    private BigDecimal totalRepayment;
+
+    @Column(name = "emi_duration_months")
+    private int emiDurationMonths;
 
 
-    public LoanEntity(long userId, long bankId, double roi, long years, double principal) {
+    public LoanEntity(long userId, long bankId, BigDecimal roi, int years, BigDecimal principal) {
         this.userId = userId;
         this.bankId = bankId;
         this.roi = roi;

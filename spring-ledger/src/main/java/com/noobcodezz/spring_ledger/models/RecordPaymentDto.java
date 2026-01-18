@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecordPaymentDto {
     private String loanRefId;
-    private double amount;
+    private BigDecimal amount;
     private int emiNumber;
 }
