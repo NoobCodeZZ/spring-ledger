@@ -27,7 +27,6 @@ public class LoanService {
 
     public String createLoan(LoanCreationDto loanCreationDto) {
 
-
         List<String> errors = new ArrayList<>();
 
         if(bankDbService.findByBankReferenceId(loanCreationDto.getBankRefId()).isEmpty()) {
@@ -37,10 +36,14 @@ public class LoanService {
         if(userDbService.findByUserReferenceId(loanCreationDto.getUserRefId()).isEmpty()) {
             errors.add("User with ID: " + loanCreationDto.getUserRefId() + " not found");
         }
+        if(loanCreationDto.getRoi() <= 0 || loanCreationDto.getYears() <= 0 || loanCreationDto.getPrincipal() <= 0) {
+            errors.add("Invalid parameters : input parameters cannot be negative or zero");
+        }
 
         if(!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
+
 
         LoanDto loanDto = new LoanDto();
         loanDto.setPrincipal(loanCreationDto.getPrincipal());
@@ -62,9 +65,15 @@ public class LoanService {
             errors.add("Loan with ID: " + recordPaymentDto.getLoanRefId()+ " not found");
         }
 
+        if(recordPaymentDto.getAmount() <= 0|| recordPaymentDto.getEmiNumber() <= 0) {
+            errors.add("Invalid parameters : input parameters cannot be negative or zero");
+        }
+
         if(!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
+
+
         PaymentDto paymentDto = new PaymentDto();
         paymentDto.setAmount(recordPaymentDto.getAmount());
         paymentDto.setEmiNumber(recordPaymentDto.getEmiNumber());
@@ -83,6 +92,10 @@ public class LoanService {
 
         if(loanDbService.findByLoanReferenceID(requestBalanceDto.getLoanRefId()).isEmpty()) {
             errors.add("Loan with ID: " + requestBalanceDto.getLoanRefId()+ " not found");
+        }
+
+        if(requestBalanceDto.getEmiNumber() <= 0) {
+            errors.add("Invalid parameters : input parameters cannot be negative or zero");
         }
 
         if(!errors.isEmpty()) {
