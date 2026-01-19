@@ -93,12 +93,4 @@ public class LoanDbService {
                 .map(this::mapEntityToDto);
     }
 
-//    private Optional<LoanEntity> mapDtoToEntity() {
-//
-//    }
-//
-//    private Optional<LoanDto> mapEntityToDto() {
-//
-//    }
-
 }

@@ -16,14 +16,5 @@ public class BankDbService {
     public Optional<BankEntity> findByBankReferenceId(String bankRefId) {
         return bankRepository.findByReferenceId(bankRefId);
     }
-
-//    private BankEntity mapDtoToEntity(BankDto bankDto) {
-//        BankEntity bankEntity = new BankEntity();
-//        return bankEntity;
-//    }
-
-//    private  BankDto mapEntityToDto(BankEntity bankEntity) {
-//        BankDto bankDto = new BankDto();
-//        return
-//    }
+    
 }

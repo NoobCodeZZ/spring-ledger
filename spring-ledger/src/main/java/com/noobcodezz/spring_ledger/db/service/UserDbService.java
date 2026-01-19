@@ -17,9 +17,4 @@ public class UserDbService {
     public Optional<UserEntity> findByUserReferenceId(String userRefId) {
         return userRepository.findByReferenceId(userRefId);
     }
-
-//    private Optional<UserDto> mapEntityToDto(UserEntity userEntity) {}
-//
-//    private Optional<UserEntity> mapDtoToEntity(UserDto userDto) {}
-
 }
