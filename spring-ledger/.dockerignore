@@ -1,0 +1,30 @@
+# Gradle build files
+.gradle/
+build/
+!build/libs/
+
+# IDE files
+.idea/
+*.iml
+*.iws
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local configuration
+src/main/resources/application-local.properties
+
+# Test files
+target/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+HELP.md
+now
